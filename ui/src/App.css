@@ -68,25 +68,23 @@
   max-height: calc(100vh - 120px);
 }
 
-.admin-placeholder {
-  max-width: 1200px;
-  margin: 4rem auto;
-  padding: 3rem;
-  text-align: center;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.admin-page {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-.admin-placeholder h2 {
-  color: #5C4033;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.admin-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
-.admin-placeholder p {
-  color: #666;
-  font-size: 1.2rem;
+@media (max-width: 1024px) {
+  .admin-content {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* 반응형 디자인 */

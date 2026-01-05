@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import MenuCard from './components/MenuCard'
 import Cart from './components/Cart'
+import AdminDashboard from './components/AdminDashboard'
+import InventoryStatus from './components/InventoryStatus'
+import OrderStatus from './components/OrderStatus'
 import './App.css'
 
 // 임의의 커피 메뉴 데이터
@@ -47,12 +50,15 @@ const menuData = [
 function App() {
   const [currentPage, setCurrentPage] = useState('order')
   const [cartItems, setCartItems] = useState([])
+  const [orders, setOrders] = useState([])
+  const [inventory, setInventory] = useState([
+    { id: 1, name: '아메리카노(ICE)', quantity: 10 },
+    { id: 2, name: '아메리카노(HOT)', quantity: 10 },
+    { id: 3, name: '카페라떼', quantity: 10 }
+  ])
 
   const handleNavigate = (page) => {
     setCurrentPage(page)
-    if (page === 'admin') {
-      alert('관리자 화면은 준비 중입니다.')
-    }
   }
 
   const handleAddToCart = (item) => {
@@ -93,18 +99,69 @@ function App() {
   }
 
   const handleOrder = () => {
-    // 주문 처리 로직 (추후 백엔드 연동)
-    console.log('주문 내역:', cartItems)
+    if (cartItems.length === 0) return
+
+    // 주문 생성
+    const newOrder = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      items: cartItems.map(item => ({
+        menuId: item.menuId,
+        menuName: item.menuName,
+        options: item.options,
+        quantity: item.quantity,
+        finalPrice: item.finalPrice
+      })),
+      status: '주문 접수'
+    }
+
+    setOrders(prev => [newOrder, ...prev])
     setCartItems([])
+    alert('주문이 완료되었습니다!')
+  }
+
+  const handleUpdateInventory = (menuId, change) => {
+    setInventory(prev =>
+      prev.map(item =>
+        item.id === menuId
+          ? { ...item, quantity: Math.max(0, item.quantity + change) }
+          : item
+      )
+    )
+  }
+
+  const handleUpdateOrderStatus = (orderId, newStatus) => {
+    setOrders(prev =>
+      prev.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    )
+  }
+
+  // 대시보드 통계 계산
+  const dashboardStats = {
+    total: orders.length,
+    received: orders.filter(o => o.status === '주문 접수').length,
+    inProgress: orders.filter(o => o.status === '제조 중').length,
+    completed: orders.filter(o => o.status === '제조 완료').length
   }
 
   if (currentPage === 'admin') {
     return (
       <div className="app">
         <Header currentPage={currentPage} onNavigate={handleNavigate} />
-        <div className="admin-placeholder">
-          <h2>관리자 화면</h2>
-          <p>준비 중입니다...</p>
+        <div className="admin-page">
+          <AdminDashboard stats={dashboardStats} />
+          <div className="admin-content">
+            <InventoryStatus
+              inventory={inventory}
+              onUpdateInventory={handleUpdateInventory}
+            />
+            <OrderStatus
+              orders={orders}
+              onUpdateOrderStatus={handleUpdateOrderStatus}
+            />
+          </div>
         </div>
       </div>
     )
