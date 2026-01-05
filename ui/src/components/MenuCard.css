@@ -1,0 +1,102 @@
+.menu-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.menu-image {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #D2B48C 0%, #BC9A6A 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-placeholder {
+  font-size: 4rem;
+  opacity: 0.7;
+}
+
+.menu-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.menu-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #5C4033;
+}
+
+.menu-price {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.menu-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #5C4033;
+}
+
+.option-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #8B4513;
+}
+
+.add-to-cart-button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+  background-color: #A0522D;
+  transform: scale(1.02);
+}
+
+.add-to-cart-button:active {
+  transform: scale(0.98);
+}
+

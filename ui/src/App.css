@@ -1,15 +1,115 @@
-#root {
-  max-width: 1280px;
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F5E6D3 0%, #E8D5B7 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.order-page {
+  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 2rem;
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #5C4033;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid #8B4513;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  padding-right: 0.5rem;
+}
+
+.menu-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu-grid::-webkit-scrollbar-track {
+  background: #F5E6D3;
+  border-radius: 4px;
+}
+
+.menu-grid::-webkit-scrollbar-thumb {
+  background: #8B4513;
+  border-radius: 4px;
+}
+
+.menu-grid::-webkit-scrollbar-thumb:hover {
+  background: #A0522D;
+}
+
+.cart-section {
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+  max-height: calc(100vh - 120px);
+}
+
+.admin-placeholder {
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 3rem;
   text-align: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.App {
-  padding: 2rem;
+.admin-placeholder h2 {
+  color: #5C4033;
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
-.card {
-  padding: 2em;
+.admin-placeholder p {
+  color: #666;
+  font-size: 1.2rem;
 }
 
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .order-page {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-section {
+    position: static;
+  }
+
+  .menu-grid {
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-page {
+    padding: 1rem;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
