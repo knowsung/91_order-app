@@ -19,7 +19,6 @@ function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onOrder }) {
   const handleOrder = () => {
     if (cartItems.length === 0) return
     onOrder()
-    alert('주문이 완료되었습니다!')
   }
 
   return (
@@ -32,7 +31,7 @@ function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onOrder }) {
           <div className="cart-items-section">
             <div className="cart-items">
               {cartItems.map((item, index) => (
-                <div key={index} className="cart-item">
+                <div key={`${item.menuId}-${item.options.join('-')}-${index}`} className="cart-item">
                   <div className="cart-item-info">
                     <span className="cart-item-name">
                       {getItemDisplayName(item)} X {item.quantity}
