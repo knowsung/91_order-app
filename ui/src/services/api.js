@@ -1,5 +1,8 @@
 // API 서비스 레이어
-const API_BASE_URL = 'http://localhost:3000/api'
+// 환경 변수에서 API URL 가져오기 (배포 시 설정)
+// 개발 환경: http://localhost:3000/api
+// 프로덕션: 환경 변수 VITE_API_URL 또는 백엔드 서버 URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 // 공통 fetch 함수
 async function fetchAPI(endpoint, options = {}) {

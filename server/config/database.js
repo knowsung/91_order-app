@@ -6,16 +6,33 @@ dotenv.config()
 const { Pool } = pg
 
 // 데이터베이스 연결 풀 생성
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || 'cozy_order_app',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '',
-  max: 20, // 최대 연결 수
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000, // 연결 타임아웃 증가
-})
+// Render.com에서는 DATABASE_URL 환경 변수를 제공하므로 이를 우선 사용
+let poolConfig
+
+if (process.env.DATABASE_URL) {
+  // Render.com의 Internal Database URL 사용
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  }
+} else {
+  // 로컬 개발 환경
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME || 'cozy_order_app',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || '',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  }
+}
+
+const pool = new Pool(poolConfig)
 
 // 연결 이벤트 핸들러
 pool.on('connect', (client) => {
