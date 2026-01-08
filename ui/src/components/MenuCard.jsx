@@ -45,10 +45,40 @@ function MenuCard({ menu, onAddToCart }) {
     return price.toLocaleString('ko-KR')
   }
 
+  // 이미지 URL 처리
+  const getImageUrl = () => {
+    // 데이터베이스에 image_url이 있으면 사용
+    if (menu.image_url) {
+      return menu.image_url
+    }
+    
+    // 메뉴명 기반으로 이미지 파일명 매핑
+    const imageMap = {
+      '아메리카노(HOT)': '/images/americano-hot_1.jpg',
+      '아메리카노(ICE)': '/images/americano-ice_2.jpg',
+      '카페라떼': '/images/cafe-latte.jpg',
+    }
+    
+    return imageMap[menu.name] || null
+  }
+
   return (
     <div className="menu-card">
       <div className="menu-image">
-        <div className="image-placeholder">☕</div>
+        {getImageUrl() ? (
+          <img 
+            src={getImageUrl()} 
+            alt={menu.name}
+            onError={(e) => {
+              // 이미지 로드 실패 시 플레이스홀더 표시
+              e.target.style.display = 'none'
+              e.target.nextSibling.style.display = 'flex'
+            }}
+          />
+        ) : null}
+        <div className="image-placeholder" style={{ display: getImageUrl() ? 'none' : 'flex' }}>
+          ☕
+        </div>
       </div>
       <div className="menu-info">
         <h3 className="menu-name">{menu.name}</h3>
