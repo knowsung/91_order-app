@@ -1,36 +1,100 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
+# package-lock.json은 버전 관리에 포함 (의존성 버전 고정)
 
-# Environment variables
+# Environment variables (절대 커밋하지 말 것!)
 .env
 .env.local
+.env.development
+.env.production
+.env.test
 .env.*.local
+.env.backup
 
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log.*
 
-# OS
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
-# IDE
+# IDE and editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
-# Build
+# Build outputs
 dist/
 build/
+out/
+*.tsbuildinfo
 
-# Test
+# Test coverage
 coverage/
 .nyc_output/
+*.lcov
+.jest/
+
+# Database
+*.sql.backup
+*.db
+*.sqlite
+*.sqlite3
+dump.sql
+backup.sql
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variable files (이미 위에 있지만 명시적으로)
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
 

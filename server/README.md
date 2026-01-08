@@ -16,11 +16,31 @@ Express.js를 사용한 RESTful API 서버입니다.
 npm install
 ```
 
-### 2. 환경 변수 설정
-`.env.example` 파일을 참고하여 `.env` 파일을 생성하고 데이터베이스 정보를 입력하세요.
+### 2. 데이터베이스 설정
+
+**PostgreSQL 데이터베이스 생성:**
+```bash
+# PostgreSQL에 접속
+psql -U postgres
+
+# 데이터베이스 생성
+CREATE DATABASE cozy_order_app;
+
+# 데이터베이스 선택
+\c cozy_order_app
+
+# 스키마 초기화 (scripts/init-db.sql 파일 실행)
+\i scripts/init-db.sql
+
+# 또는 psql 명령줄에서 직접 실행
+psql -U postgres -d cozy_order_app -f scripts/init-db.sql
+```
+
+### 3. 환경 변수 설정
+`env.example` 파일을 참고하여 `.env` 파일을 생성하고 데이터베이스 정보를 입력하세요.
 
 ```bash
-cp .env.example .env
+cp env.example .env
 ```
 
 `.env` 파일 편집:
@@ -34,7 +54,14 @@ DB_PASSWORD=your_password
 NODE_ENV=development
 ```
 
-### 3. 서버 실행
+### 4. 데이터베이스 연결 테스트
+```bash
+npm run test-db
+```
+
+이 명령어는 데이터베이스 연결을 테스트하고 연결 상태를 확인합니다.
+
+### 5. 서버 실행
 
 **개발 모드** (파일 변경 시 자동 재시작):
 ```bash
@@ -53,6 +80,7 @@ npm start
 ### 기본 엔드포인트
 - `GET /` - 서버 상태 확인
 - `GET /api/health` - 헬스 체크
+- `GET /api/db-test` - 데이터베이스 연결 테스트
 
 ### 메뉴 관련 (추가 예정)
 - `GET /api/menus` - 메뉴 목록 조회
