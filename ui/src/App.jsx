@@ -1,61 +1,91 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import MenuCard from './components/MenuCard'
 import Cart from './components/Cart'
 import AdminDashboard from './components/AdminDashboard'
 import InventoryStatus from './components/InventoryStatus'
 import OrderStatus from './components/OrderStatus'
+import { menuAPI, orderAPI } from './services/api'
 import './App.css'
-
-// 임의의 커피 메뉴 데이터
-const menuData = [
-  {
-    id: 1,
-    name: '아메리카노(ICE)',
-    price: 4000,
-    description: '시원하고 깔끔한 아이스 아메리카노입니다.'
-  },
-  {
-    id: 2,
-    name: '아메리카노(HOT)',
-    price: 4000,
-    description: '따뜻하고 진한 핫 아메리카노입니다.'
-  },
-  {
-    id: 3,
-    name: '카페라떼',
-    price: 5000,
-    description: '부드러운 우유와 에스프레소의 조화입니다.'
-  },
-  {
-    id: 4,
-    name: '카푸치노',
-    price: 5000,
-    description: '우유 거품이 올라간 부드러운 카푸치노입니다.'
-  },
-  {
-    id: 5,
-    name: '카라멜 마키아토',
-    price: 6000,
-    description: '달콤한 카라멜과 에스프레소의 만남입니다.'
-  },
-  {
-    id: 6,
-    name: '바닐라 라떼',
-    price: 5500,
-    description: '바닐라 시럽이 들어간 부드러운 라떼입니다.'
-  }
-]
 
 function App() {
   const [currentPage, setCurrentPage] = useState('order')
+  const [menuData, setMenuData] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [orders, setOrders] = useState([])
-  const [inventory, setInventory] = useState([
-    { id: 1, name: '아메리카노(ICE)', quantity: 10 },
-    { id: 2, name: '아메리카노(HOT)', quantity: 10 },
-    { id: 3, name: '카페라떼', quantity: 10 }
-  ])
+  const [inventory, setInventory] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // 메뉴 데이터 로드
+  useEffect(() => {
+    loadMenus()
+  }, [])
+
+  // 주문 목록 로드 (관리자 화면)
+  useEffect(() => {
+    if (currentPage === 'admin') {
+      loadOrders()
+      loadInventory()
+    }
+  }, [currentPage])
+
+  // 주문 목록 주기적 갱신 (관리자 화면)
+  useEffect(() => {
+    if (currentPage === 'admin') {
+      const interval = setInterval(() => {
+        loadOrders()
+        loadInventory()
+      }, 5000) // 5초마다 갱신
+
+      return () => clearInterval(interval)
+    }
+  }, [currentPage])
+
+  const loadMenus = async () => {
+    try {
+      setLoading(true)
+      const menus = await menuAPI.getMenus()
+      setMenuData(menus)
+      setError(null)
+    } catch (err) {
+      console.error('메뉴 로드 오류:', err)
+      setError('메뉴를 불러오는 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadOrders = async () => {
+    try {
+      const ordersData = await orderAPI.getOrders()
+      // API 응답 형식에 맞게 변환
+      const formattedOrders = ordersData.map(order => ({
+        id: order.id,
+        date: order.order_date,
+        status: order.status,
+        total_amount: order.total_amount,
+        items: order.items || []
+      }))
+      setOrders(formattedOrders)
+    } catch (err) {
+      console.error('주문 목록 로드 오류:', err)
+    }
+  }
+
+  const loadInventory = async () => {
+    try {
+      const menus = await menuAPI.getMenus()
+      const inventoryData = menus.map(menu => ({
+        id: menu.id,
+        name: menu.name,
+        quantity: menu.stock_quantity
+      }))
+      setInventory(inventoryData)
+    } catch (err) {
+      console.error('재고 로드 오류:', err)
+    }
+  }
 
   const handleNavigate = (page) => {
     setCurrentPage(page)
@@ -98,44 +128,99 @@ function App() {
     setCartItems(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (cartItems.length === 0) return
 
-    // 주문 생성
-    const newOrder = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      items: cartItems.map(item => ({
-        menuId: item.menuId,
-        menuName: item.menuName,
-        options: item.options,
-        quantity: item.quantity,
-        finalPrice: item.finalPrice
-      })),
-      status: '주문 접수'
+    try {
+      // API 형식에 맞게 변환
+      const orderItems = cartItems.map(item => {
+        // 옵션 이름을 옵션 ID로 변환
+        const optionIds = []
+        if (item.options && item.options.length > 0) {
+          const menu = menuData.find(m => m.id === item.menuId)
+          if (menu && menu.options) {
+            item.options.forEach(optionName => {
+              const option = menu.options.find(opt => opt.name === optionName)
+              if (option) {
+                optionIds.push(option.id)
+              }
+            })
+          }
+        }
+
+        return {
+          menu_id: item.menuId,
+          quantity: item.quantity,
+          option_ids: optionIds,
+          unit_price: item.finalPrice,
+          total_price: item.finalPrice * item.quantity
+        }
+      })
+
+      const totalAmount = cartItems.reduce(
+        (sum, item) => sum + item.finalPrice * item.quantity,
+        0
+      )
+
+      // API 호출
+      await orderAPI.createOrder({
+        items: orderItems,
+        total_amount: totalAmount
+      })
+
+      setCartItems([])
+      alert('주문이 완료되었습니다!')
+      
+      // 관리자 화면이면 주문 목록 새로고침
+      if (currentPage === 'admin') {
+        loadOrders()
+        loadInventory()
+      }
+    } catch (err) {
+      console.error('주문 생성 오류:', err)
+      alert(`주문 생성 실패: ${err.message}`)
     }
-
-    setOrders(prev => [newOrder, ...prev])
-    setCartItems([])
-    alert('주문이 완료되었습니다!')
   }
 
-  const handleUpdateInventory = (menuId, change) => {
-    setInventory(prev =>
-      prev.map(item =>
-        item.id === menuId
-          ? { ...item, quantity: Math.max(0, item.quantity + change) }
-          : item
+  const handleUpdateInventory = async (menuId, change) => {
+    try {
+      const currentItem = inventory.find(item => item.id === menuId)
+      if (!currentItem) return
+
+      const newQuantity = Math.max(0, currentItem.quantity + change)
+      
+      // API 호출
+      await menuAPI.updateStock(menuId, newQuantity)
+      
+      // 로컬 상태 업데이트
+      setInventory(prev =>
+        prev.map(item =>
+          item.id === menuId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
       )
-    )
+    } catch (err) {
+      console.error('재고 업데이트 오류:', err)
+      alert(`재고 업데이트 실패: ${err.message}`)
+    }
   }
 
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
-    setOrders(prev =>
-      prev.map(order =>
-        order.id === orderId ? { ...order, status: newStatus } : order
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      // API 호출
+      await orderAPI.updateOrderStatus(orderId, newStatus)
+      
+      // 로컬 상태 업데이트
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
       )
-    )
+    } catch (err) {
+      console.error('주문 상태 업데이트 오류:', err)
+      alert(`주문 상태 업데이트 실패: ${err.message}`)
+    }
   }
 
   // 대시보드 통계 계산
@@ -146,10 +231,10 @@ function App() {
     completed: orders.filter(o => o.status === '제조 완료').length
   }
 
-  if (currentPage === 'admin') {
-    return (
-      <div className="app">
-        <Header currentPage={currentPage} onNavigate={handleNavigate} />
+  return (
+    <div className="app">
+      <Header currentPage={currentPage} onNavigate={handleNavigate} />
+      {currentPage === 'admin' ? (
         <div className="admin-page">
           <AdminDashboard stats={dashboardStats} />
           <div className="admin-content">
@@ -163,35 +248,44 @@ function App() {
             />
           </div>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="app">
-      <Header currentPage={currentPage} onNavigate={handleNavigate} />
-      <div className="order-page">
-        <div className="menu-section">
-          <h2 className="section-title">메뉴</h2>
-          <div className="menu-grid">
-            {menuData.map(menu => (
-              <MenuCard
-                key={menu.id}
-                menu={menu}
-                onAddToCart={handleAddToCart}
-              />
-            ))}
+      ) : (
+        <div className="order-page">
+          <div className="menu-section">
+            <h2 className="section-title">메뉴</h2>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                메뉴를 불러오는 중...
+              </div>
+            ) : error ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+                {error}
+                <br />
+                <button onClick={loadMenus} style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
+                  다시 시도
+                </button>
+              </div>
+            ) : (
+              <div className="menu-grid">
+                {menuData.map(menu => (
+                  <MenuCard
+                    key={menu.id}
+                    menu={menu}
+                    onAddToCart={handleAddToCart}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="cart-section">
+            <Cart
+              cartItems={cartItems}
+              onUpdateQuantity={handleUpdateQuantity}
+              onRemoveItem={handleRemoveItem}
+              onOrder={handleOrder}
+            />
           </div>
         </div>
-        <div className="cart-section">
-          <Cart
-            cartItems={cartItems}
-            onUpdateQuantity={handleUpdateQuantity}
-            onRemoveItem={handleRemoveItem}
-            onOrder={handleOrder}
-          />
-        </div>
-      </div>
+      )}
     </div>
   )
 }

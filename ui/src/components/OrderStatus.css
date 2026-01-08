@@ -132,19 +132,22 @@
 }
 
 .status-button {
-  padding: 0.6rem 1.2rem;
-  border: none;
+  padding: 0.7rem 1.5rem;
+  border: 2px solid transparent;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  min-width: 100px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .status-button.start {
   background-color: #4682B4;
   color: white;
+  border-color: #4682B4;
 }
 
 .status-button.start:hover {

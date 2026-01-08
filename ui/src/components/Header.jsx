@@ -3,7 +3,7 @@ import './Header.css'
 function Header({ currentPage, onNavigate }) {
   return (
     <header className="header">
-      <div className="header-logo">셰익스피어 & 친구들 카페</div>
+      <div className="header-logo">카페 모항</div>
       <nav className="header-nav">
         <button
           className={`nav-button ${currentPage === 'order' ? 'active' : ''}`}

@@ -25,37 +25,44 @@ function InventoryStatus({ inventory, onUpdateInventory }) {
   return (
     <div className="inventory-status">
       <h2 className="inventory-title">재고 현황</h2>
-      <div className="inventory-grid">
-        {inventory.map(item => {
-          const status = getInventoryStatus(item.quantity)
-          return (
-            <div key={item.id} className="inventory-card">
-              <h3 className="inventory-menu-name">{item.name}</h3>
-              <div className="inventory-quantity">
-                <span className="quantity-value">{item.quantity}개</span>
-                <span className={`status-badge ${status.className}`}>
-                  {status.text}
-                </span>
+      {inventory.length === 0 ? (
+        <p style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>
+          재고 데이터를 불러오는 중...
+        </p>
+      ) : (
+        <div className="inventory-grid">
+          {inventory.map(item => {
+            const quantity = item.quantity !== undefined && item.quantity !== null ? item.quantity : 0
+            const status = getInventoryStatus(quantity)
+            return (
+              <div key={item.id} className="inventory-card">
+                <h3 className="inventory-menu-name">{item.name}</h3>
+                <div className="inventory-quantity">
+                  <span className="quantity-value">{quantity}개</span>
+                  <span className={`status-badge ${status.className}`}>
+                    {status.text}
+                  </span>
+                </div>
+                <div className="inventory-controls">
+                  <button
+                    className="inventory-button decrease"
+                    onClick={() => handleDecrease(item.id)}
+                    disabled={quantity === 0}
+                  >
+                    -
+                  </button>
+                  <button
+                    className="inventory-button increase"
+                    onClick={() => handleIncrease(item.id)}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <div className="inventory-controls">
-                <button
-                  className="inventory-button decrease"
-                  onClick={() => handleDecrease(item.id)}
-                  disabled={item.quantity === 0}
-                >
-                  -
-                </button>
-                <button
-                  className="inventory-button increase"
-                  onClick={() => handleIncrease(item.id)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

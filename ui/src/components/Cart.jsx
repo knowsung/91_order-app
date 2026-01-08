@@ -34,11 +34,14 @@ function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onOrder }) {
                 <div key={`${item.menuId}-${item.options.join('-')}-${index}`} className="cart-item">
                   <div className="cart-item-info">
                     <span className="cart-item-name">
-                      {getItemDisplayName(item)} X {item.quantity}
+                      {getItemDisplayName(item)}
                     </span>
                     <span className="cart-item-price">
                       {formatPrice(item.finalPrice * item.quantity)}원
                     </span>
+                  </div>
+                  <div className="cart-item-quantity-label">
+                    수량
                   </div>
                   <div className="cart-item-controls">
                     <button
