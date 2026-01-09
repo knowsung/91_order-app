@@ -10,6 +10,7 @@
     "check-env": "node scripts/check-env.js",
     "test-db": "node scripts/test-db.js",
     "create-db": "node scripts/create-db.js",
+    "init-db": "node scripts/init-db.js",
     "seed": "node scripts/seed-data.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
