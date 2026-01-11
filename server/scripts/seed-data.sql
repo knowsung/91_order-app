@@ -1,7 +1,7 @@
 -- 샘플 데이터 삽입 스크립트
 
 -- 기존 데이터 삭제 (선택사항 - 주의: 모든 데이터가 삭제됩니다)
--- TRUNCATE TABLE order_item_options, order_items, orders, options, menus RESTART IDENTITY CASCADE;
+TRUNCATE TABLE order_item_options, order_items, orders, options, menus RESTART IDENTITY CASCADE;
 
 -- 메뉴 데이터 삽입
 INSERT INTO menus (name, description, price, image_url, stock_quantity) VALUES

@@ -94,16 +94,23 @@ function App() {
   const handleAddToCart = (item) => {
     setCartItems(prev => {
       // 동일한 메뉴와 옵션 조합이 있는지 확인
+      // toSorted()는 새 배열을 반환하므로 상태 변경을 일으키지 않음 (Node 20+ 또는 최신 브라우저 필요)
+      // 호환성을 위해 [...array].sort() 사용
+      const itemOptionsSorted = JSON.stringify([...item.options].sort())
+
       const existingIndex = prev.findIndex(
         cartItem =>
           cartItem.menuId === item.menuId &&
-          JSON.stringify(cartItem.options.sort()) === JSON.stringify(item.options.sort())
+          JSON.stringify([...cartItem.options].sort()) === itemOptionsSorted
       )
 
       if (existingIndex !== -1) {
-        // 기존 아이템 수량 증가
+        // 기존 아이템 수량 증가 (불변성 유지)
         const updated = [...prev]
-        updated[existingIndex].quantity += 1
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          quantity: updated[existingIndex].quantity + 1
+        }
         return updated
       } else {
         // 새 아이템 추가
@@ -119,7 +126,8 @@ function App() {
     }
     setCartItems(prev => {
       const updated = [...prev]
-      updated[index].quantity = newQuantity
+      // 불변성 유지
+      updated[index] = { ...updated[index], quantity: newQuantity }
       return updated
     })
   }
@@ -170,7 +178,7 @@ function App() {
 
       setCartItems([])
       alert('주문이 완료되었습니다!')
-      
+
       // 관리자 화면이면 주문 목록 새로고침
       if (currentPage === 'admin') {
         loadOrders()
@@ -188,10 +196,10 @@ function App() {
       if (!currentItem) return
 
       const newQuantity = Math.max(0, currentItem.quantity + change)
-      
+
       // API 호출
       await menuAPI.updateStock(menuId, newQuantity)
-      
+
       // 로컬 상태 업데이트
       setInventory(prev =>
         prev.map(item =>
@@ -210,7 +218,7 @@ function App() {
     try {
       // API 호출
       await orderAPI.updateOrderStatus(orderId, newStatus)
-      
+
       // 로컬 상태 업데이트
       setOrders(prev =>
         prev.map(order =>
