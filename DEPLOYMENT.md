@@ -124,7 +124,7 @@
 4. **환경 변수 설정**
    - "Environment" 섹션에서 환경 변수 추가:
      ```
-     VITE_API_URL=z-order-app-frontend.onrender.com/api
+     VITE_API_URL=https://z-order-app.onrender.com/api
      ```
      (백엔드 서버 URL로 변경 - 2단계에서 확인한 URL 사용)
 
@@ -135,7 +135,7 @@
 6. **백엔드 CORS 설정 업데이트**
    - 백엔드 서비스의 환경 변수에서 `FRONTEND_URL` 업데이트:
      ```
-     FRONTEND_URL=z-order-app-frontend.onrender.com
+     FRONTEND_URL=https://z-order-app-frontend.onrender.com
      ```
      (프런트엔드 URL로 변경)
 
